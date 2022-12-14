@@ -1,0 +1,486 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.apache.commons.csv.CSVParser
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVRecord
+import java.util.regex.Pattern
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+		classpath group: 'org.apache.commons', name: 'commons-csv', version: '1.0'
+    }
+}
+
+apply plugin: 'base'
+apply plugin: 'jetty'
+
+ext{
+
+	csvFileIn = 'etc/pm/data/PreKFinderLoad_032416.csv'
+
+	default_env = 'dev'
+	isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
+	
+	local_form_handler_url = 'doe/form-handler.html'
+	local_apply_url = '//www.semsnycdoe.com/parentsite?local'
+	local_directory_url = 'http://schools.nyc.gov/ChoicesEnrollment/PreK/Resources/default.htm?local'
+	local_geoclient_url = '//maps.nyc.gov/geoclient/v1/search.json?app_key=07368656C6C732062&app_id=pre-k&input='
+	local_basemap_urls = '["//maps.nyc.gov/gis/data/tiles/basic/", "//maps1.nyc.gov/gis/data/tiles/basic/", "//maps2.nyc.gov/gis/data/tiles/basic/", "//maps3.nyc.gov/gis/data/tiles/basic/"]'
+	local_subway_urls = '["//maps.nyc.gov/geowebcache/service/wms/", "//maps1.nyc.gov/geowebcache/service/wms/", "//maps2.nyc.gov/geowebcache/service/wms/", "//maps3.nyc.gov/geowebcache/service/wms/"]'
+	local_date_rules = 'doe/js/date-rules.js'
+	
+	dev_form_handler_url = 'doe/form-handler.html'
+	dev_apply_url = '//www.semsnycdoe.com/parentsite' //TODO is there a dev url
+	dev_directory_url = 'http://schools.nyc.gov/ChoicesEnrollment/PreK/Resources/default.htm' //TODO is there a dev url
+	dev_geoclient_url = '//csgis-dev-web.csc.nycnet/geoclient/v1/search.json?app_key=07368656C6C732062&app_id=pre-k&input='
+	dev_basemap_urls = '["//csgis-dev-web.csc.nycnet/gis/data/tiles/basic/"]'
+	dev_subway_urls = '["//csgis-dev-web.csc.nycnet/geowebcache/service/wms/"]'
+	dev_date_rules = 'doe/js/date-rules.js'
+
+	stg_form_handler_url = '//nycenetstg.nycenet.edu/schoolsearch/form-handler.html'		
+	stg_apply_url = '//www.semsnycdoe.com/parentsite' //TODO is there a stg url
+	stg_directory_url = 'http://schools.nyc.gov/ChoicesEnrollment/PreK/Resources/default.htm' //TODO is there a stg url
+	stg_geoclient_url = '//csgis-stg-prx.csc.nycnet/geoclient/v1/search.json?app_key=07368656C6C732062&app_id=pre-k&input='
+	stg_basemap_urls = '["//csgis-stg-prx.csc.nycnet/gis/data/tiles/basic/"]'
+	stg_subway_urls = '["//csgis-stg-prx.csc.nycnet/geowebcache/service/wms/"]'
+	stg_date_rules = '//nycenetstg.nycenet.edu/schoolsearch/js/date-rules.js'
+	
+	prd_form_handler_url = '//www.nycenet.edu/schoolsearch/form-handler.html'		
+	prd_apply_url = '//www.semsnycdoe.com/parentsite'
+	prd_directory_url = 'http://schools.nyc.gov/ChoicesEnrollment/PreK/Resources/default.htm'
+	prd_geoclient_url = '//maps.nyc.gov/geoclient/v1/search.json?app_key=07368656C6C732062&app_id=pre-k&input='
+	prd_basemap_urls = '["//maps.nyc.gov/gis/data/tiles/basic/", "//maps1.nyc.gov/gis/data/tiles/basic/", "//maps2.nyc.gov/gis/data/tiles/basic/", "//maps3.nyc.gov/gis/data/tiles/basic/"]'
+	prd_subway_urls = '["//maps.nyc.gov/geowebcache/service/wms/", "//maps1.nyc.gov/geowebcache/service/wms/", "//maps2.nyc.gov/geowebcache/service/wms/", "//maps3.nyc.gov/geowebcache/service/wms/"]'
+	prd_date_rules = '//www.nycenet.edu/schoolsearch/js/date-rules.js'
+
+	csvOutColumns = ['LOCCODE', 'X', 'Y', 'PREK_TYPE', 'NAME', 'NOTE', 'ADDRESS', 'BOROUGH', 'ZIP', 'PHONE', 'EMAIL', 'WEBSITE', 
+			'DAY_LENGTH', 'SEATS', 'MEALS', 'INDOOR_OUTDOOR', 'SEMS_CODE', 'BUTTON_TYPE', 'START_TIME', 'EARLY_DROP',
+			'LATE_PICKUP', 'ENHANCED_LANG', 'FLEX_SCHED', 'SPED_FLG', 'INCOME_FLG', 'SPECIAL_PRIOR']
+	csvOutRequiredColumns = ['LOCCODE', 'X', 'Y', 'PREK_TYPE', 'NAME', 'ADDRESS', 'BOROUGH', 'ZIP', 
+			'DAY_LENGTH', 'SEATS', 'MEALS', 'INDOOR_OUTDOOR', 'EXTENDED_DAY', 'SEMS_CODE', 'BUTTON_TYPE', 'START_TIME', 'EARLY_DROP',
+			'LATE_PICKUP', 'FLEX_SCHED', 'SPED_FLG', 'INCOME_FLG']
+	csvSchoolReplace = 'etc/school_replace.csv'
+	csvAddressReplace = 'etc/address_replace.csv'
+	schoolReplace = CSVParser.parse(new File(csvSchoolReplace).getText(), CSVFormat.EXCEL).getRecords()
+	addressReplace = CSVParser.parse(new File(csvAddressReplace).getText(), CSVFormat.EXCEL).getRecords()
+
+	orderedCssFiles = ['upk.css', 'directions.css', 'control-common.css', 'lang.css', 'share.css', 'zoomsearch.css', 'get-in-touch.css']
+
+	closureArgs = [
+		"--warning_level VERBOSE",
+		"--compilation_level WHITESPACE_ONLY",
+		//"--compilation_level SIMPLE_OPTIMIZATIONS",
+		"--charset utf8",
+		"--externs etc/closure/openlayers2.js",
+		"--js_output_file build/webapp/js/nyc-min.js",
+		"build/tmp/js/nyc/*.js",
+		'--source_map_location_mapping "build/tmp/js/nyc/|nyc/"',
+		"--create_source_map build/webapp/js/nyc-min.js.map",
+		isWindows ? '--output_wrapper "%%output%%//# sourceMappingURL=nyc-min.js.map"' : '--output_wrapper "%output%//# sourceMappingURL=nyc-min.js.map"'
+	]
+	closureComiler = "etc/closure/compiler.jar"
+	comilerArgs = ''
+}
+
+task setEnv << {
+	if (!project.hasProperty('env')) project.ext.env = default_env
+    def cmd = "git rev-parse --short HEAD"
+    def proc = cmd.execute()
+	if (!project.hasProperty('revision')) project.ext.revision =  proc.text.trim()
+    println "\nbuilding from git revision ${revision}..."
+ 	println "building for ${project.ext.env} environment...\n"
+ 	buildDoe.archiveName = "get-in-touch-${revision}.zip"
+	buildDoe.from {project.ext.env == 'dev' ? 'nowhere' : 'build/tmp/doe'}
+}
+
+task makeArgs << {
+	closureArgs.each{ arg ->
+		comilerArgs += (' ' + arg)
+	}
+}
+
+task copyFiles(dependsOn: clean) << {
+	def build = new File('build/tmp')
+	build.mkdirs()
+	copy {
+		from 'src/main/webapp'
+		include 'index.html'
+		include 'get-in-touch.html'
+		include 'doe/**'
+		include 'img/**'
+		include 'css/**'
+		include 'js/ie8.js'
+		include 'js/jq/**'
+		include 'js/nyc/**'
+		include 'js/proj4js/**'
+		include 'js/OpenLayers-2.13.1/OpenLayers.js'
+		include 'js/OpenLayers-2.13.1/theme/default/style.css'
+		include 'js/OpenLayers-2.13.1/theme/default/style.mobile.tidy.css'
+		include 'js/OpenLayers-2.13.1/img/cloud-popup-relative.png'
+		into 'build/tmp' 
+	}
+}
+
+task replaceTokens(dependsOn: [setEnv, copyFiles]) << {
+	def formUrl = project.ext["${env}_form_handler_url"]
+	def directoryUrl = project.ext["${env}_directory_url"]
+	def applyUrl = project.ext["${env}_apply_url"]
+	def geoUrl = project.ext["${env}_geoclient_url"]
+	def subwayUrls = project.ext["${env}_subway_urls"]
+	def baseUrls = project.ext["${env}_basemap_urls"]
+	def dateRules = project.ext["${env}_date_rules"]
+
+ 	println "APPLY_URL=${applyUrl}" 
+ 	println "DIRECTORY_URL=${directoryUrl}" 
+ 	println "DATE_RULES_URL=${dateRules}" 
+ 	println "GEOCLIENT_URL=${geoUrl}"
+ 	println "SUBWAY_URLS=${subwayUrls}"
+ 	println "BASEMAP_URLS=${baseUrls}\n"
+
+	ant.taskdef(name: 'replace', classname: 'org.apache.tools.ant.taskdefs.Replace')	
+	ant.replace(file: 'build/tmp/js/nyc/constants.js', token: local_form_handler_url, value: formUrl)
+	ant.replace(file: 'build/tmp/js/nyc/constants.js', token: local_apply_url, value: applyUrl)
+	ant.replace(file: 'build/tmp/js/nyc/constants.js', token: local_geoclient_url, value: geoUrl)
+	ant.replace(file: 'build/tmp/js/nyc/constants.js', token: local_subway_urls, value: subwayUrls)
+	ant.replace(file: 'build/tmp/js/nyc/constants.js', token: local_basemap_urls, value: baseUrls)
+	ant.replace(file: 'build/tmp/index.html', token: local_directory_url, value: directoryUrl)
+	ant.replace(file: 'build/tmp/index.html', token: local_apply_url, value: applyUrl)
+	ant.replace(file: 'build/tmp/index.html', token: local_date_rules, value: dateRules)
+	ant.replace(file: 'build/tmp/get-in-touch.html', token: local_date_rules, value: dateRules)
+}
+
+task makeScriptAndExec(dependsOn: [replaceTokens, makeArgs]) << {
+	println "\nwriting script...\n\njava -jar ${closureComiler} ${comilerArgs}\n"
+	def scriptFileName = isWindows ? 'compile.bat' : 'compile.sh'
+	def scriptFilePath = isWindows ? scriptFileName : "build/tmp/${scriptFileName}"
+	def tmp = new File('./build/tmp')
+	def bld = new File('./build/webapp/js')
+	tmp.mkdirs()	
+	bld.mkdirs()	
+	def scriptFile = new File(scriptFilePath) //TODO make available as shell script too
+	scriptFile.text = "java -jar ${closureComiler} ${comilerArgs}"	
+	println "\nexecuting script...\n${scriptFileName}\n"
+    if (!isWindows){
+	    copy {
+		    from 'build/tmp'
+		    include scriptFileName
+		    into './' 
+			fileMode 0755
+		}
+	}
+	exec {commandLine = [(!isWindows ? './' : '') + scriptFileName]}
+}
+
+task minifyScript(dependsOn: makeScriptAndExec)
+
+task minifyCss(dependsOn: [setEnv, clean, copyFiles]) << {
+	if (env != 'dev'){
+	def cssOut = new File('build/tmp/css/upk-min.css')
+		orderedCssFiles.each{ cssFile ->
+			def css = file("build/tmp/css/${cssFile}").getText('UTF-8')
+			css = css.replaceAll(/[\n\r]+\s*/, '')
+			css = css.replaceAll(/\s+/, ' ')
+			css = css.replaceAll(/\s?([:,;{}])\s?/, '$1')
+			css = css.replaceAll(/([\s:]0)(px|pt|%|em)/, '$1')
+			css = css.replaceAll(/\/\*[\d\D]*?\*\//, '')
+			cssOut.append(css)
+		}
+	}
+}
+
+task cleanCsv(dependsOn: clean) << {
+	println "\nparsing ${csvFileIn} file...\n"
+	CSVParser parser = CSVParser.parse(new File(csvFileIn).getText(), CSVFormat.EXCEL)
+	def build = new File('build/webapp')
+	build.mkdirs()
+	def csvFileOut = file('build/webapp/upk.csv')
+	def log = file('build/error.log')
+	def first = true
+	def inColumns
+	csvFileOut.append("${csvOutColumns.join(',')}\n")
+	for(inRecord in parser.getRecords()) {
+		if (first){
+			first = false
+			inColumns = inRecord
+		}else{
+			if (!ValidateRequired.validate(csvOutRequiredColumns, inColumns, inRecord, log)){
+				//continue
+			}
+			def i = 0
+			def newRecord = new ArrayList(csvOutColumns.size())
+			for (def inColIndex = 0; inColIndex < inColumns.size(); inColIndex++){
+				def outCol = inColumns[inColIndex]
+				def outColIndex = csvOutColumns.indexOf(outCol)
+				if (outColIndex > -1){
+					def badFormatResult = false 
+					def value = inRecord[inColIndex]
+					if (!value.isNumber() || outCol == 'PHONE'){
+						def formatted = FormatAndValidate.formatAndValidate(project, outCol, value, inRecord, log)
+						if (!formatted[0]){
+							//continue
+						}
+						value = "\"${formatted[1]}\""					
+						//value = "\"${value}\""					
+					}
+					newRecord[outColIndex] = value 
+				}
+			}
+			csvFileOut.append("${newRecord.join(',')}\n")
+		}
+	}
+}
+
+task rewiteSrcs(dependsOn: [cleanCsv, minifyScript, minifyCss]) << {
+	ant.taskdef(name: 'replace', classname: 'org.apache.tools.ant.taskdefs.Replace')	
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/constants.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/upk.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/locate.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/lang.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/directions.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/share.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/zoomsearch.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/get-in-touch.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/date.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/lookup.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: '<script src="js/nyc/check.js"></script>', value: '')
+	ant.replace(file: 'build/tmp/index.html', token: 'js/nyc/app.js', value: 'js/nyc-min.js')
+
+	if (env != 'dev'){
+		ant.replace(file: 'build/tmp/index.html', token: '<link rel="stylesheet" href="css/directions.css" type="text/css">', value: '')
+		ant.replace(file: 'build/tmp/index.html', token: '<link rel="stylesheet" href="css/control-common.css" type="text/css">', value: '')
+		ant.replace(file: 'build/tmp/index.html', token: '<link rel="stylesheet" href="css/lang.css" type="text/css">', value: '')
+		ant.replace(file: 'build/tmp/index.html', token: '<link rel="stylesheet" href="css/share.css" type="text/css">', value: '')
+		ant.replace(file: 'build/tmp/index.html', token: '<link rel="stylesheet" href="css/zoomsearch.css" type="text/css">', value: '')
+		ant.replace(file: 'build/tmp/index.html', token: '<link rel="stylesheet" href="css/get-in-touch.css" type="text/css">', value: '')
+		ant.replace(file: 'build/tmp/index.html', token: 'css/upk.css', value: 'css/upk-min.css')
+		ant.replace(file: 'build/tmp/get-in-touch.html', token: '<link rel="stylesheet" href="css/get-in-touch.css" type="text/css">', value: '')
+		ant.replace(file: 'build/tmp/get-in-touch.html', token: 'css/upk.css', value: 'css/upk-min.css')
+	}
+}
+
+task buildDoe(type: Zip, dependsOn: [setEnv, copyFiles]) {}
+
+task buildApp(dependsOn: [rewiteSrcs, buildDoe]) << {
+	copy {
+		from 'build/tmp'
+		include 'index.html'
+		include 'get-in-touch.html'
+		include 'upk.csv'
+		include 'css/upk-min.css'
+		include 'css/ie8.css'
+		include 'img/**'
+		include 'js/**'
+		include 'doe/**'
+		exclude 'upk.csv'
+		into 'build/webapp'
+	}
+	println "\nCleaning up...\n"
+	if (env != 'dev'){
+		delete 'build/webapp/doe'
+	}
+	delete 'build/tmp'
+	delete 'compile.bat'
+	delete 'compile.sh'
+}
+
+jettyRun {
+	webAppSourceDirectory file('./')
+	contextPath ''
+	httpPort 8088
+	stopPort 8090
+	stopKey 'stopKey'
+	reload 'automatic'
+	scanIntervalSeconds 2
+}
+
+jettyStop {
+	stopPort 8090
+	stopKey 'stopKey'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion '2.3'
+}
+
+task testMe << { //TODO proper testing as part of plugin
+	def schoolReplace = CSVParser.parse(new File(csvSchoolReplace).getText(), CSVFormat.EXCEL).getRecords()
+	//def addressReplace = CSVParser.parse(new File(csvAddressReplace).getText(), CSVFormat.EXCEL).getRecords()	
+	
+	println '' 
+	println 'before format = 2126161851' 
+	println 'after format = ' + Phone.format('2126161851')
+	println Phone.format('2126161851') == '212-616-1851' ? 'SUCCESS' : 'FAIL'
+	println '' 
+	println 'before format = (718) 123-4567' 
+	println 'after format = ' + Phone.format('(718) 123-4567')
+	println Phone.format('(718) 123-4567') == '718-123-4567' ? 'SUCCESS' : 'FAIL'
+	println '' 
+	println 'before format = 1 (718) 123.4567.x123' 
+	println 'after format = ' + Phone.format(' 1 (718) 123.4567.x123')
+	println Phone.format(' 1 (718) 123.4567.x123') == '718-123-4567 x123' ? 'SUCCESS' : 'FAIL'
+	println '' 	
+	println 'before format = 7181234567' 
+	println 'after format = ' + Phone.format('7181234567')
+	println Phone.format('7181234567') == '718-123-4567' ? 'SUCCESS' : 'FAIL'
+	println '' 	
+	println 'before format = (718)123-4567 x123' 
+	println 'after format = ' + Phone.format('(718)123-4567 x123')
+	println Phone.format('(718)123-4567 x123') == '718-123-4567 x123' ? 'SUCCESS' : 'FAIL'
+	println '' 	
+	println 'before format = PS./MS Bedford STUYVESANT EARLY CHILDHOOD development Center'
+	println 'after format = ' + Format.format('PS./MS Bedford STUYVESANT EARLY CHILDHOOD development Center', schoolReplace)
+	println Format.format('PS./MS Bedford STUYVESANT EARLY CHILDHOOD development Center', schoolReplace) == 'P.S. / M.S. Bedford Stuyvesant ECDC' ? 'SUCCESS' : 'FAIL'
+}
+
+task testFormatAndValidate << {
+	def build = new File('build/webapp')
+	build.mkdirs()
+	def log = file('build/error.log')
+	String value = 'PS./MS Bedford STUYVESANT EARLY CHILDHOOD development Center'
+	println value
+	println FormatAndValidate.formatAndValidate(project, 'NAME', value, null, log)
+
+	value = 'nonSensE'
+	println value
+	println FormatAndValidate.formatAndValidate(project, 'OTHER', value, null, log)
+	
+}
+
+//TODO create a plugin for cleaning up the CSV
+
+class FormatAndValidate {
+	static List formatAndValidate(Project prj, String columnName, String value, CSVRecord inRecord, File log) {
+		def valid = true 
+		if (columnName == "NAME" || columnName == "ADDRESS"){
+			value = Format.format(value, columnName == "NAME" ? prj.property('schoolReplace') : prj.property('addressReplace'))
+			valid = value != ''
+		}else if (columnName == "PHONE"){
+			value = Phone.format(value)
+			valid = value != ''
+		}else if (columnName == "WEBSITE"){
+			value = Website.format(value)
+		}
+		if (!valid){
+			def error = "FORMAT ERROR ${columnName}='${value}' ${inRecord}"
+			println error
+			log.append("${error}\n")
+		}
+		return [valid, value]
+	}
+}
+
+class ValidateRequired {
+	static boolean validate(List reuiredColumns, CSVRecord inColumns, CSVRecord inRecord, File log) {
+		def requiredColumnsWithoutValues = []
+		for (def inColIndex = 0; inColIndex < inColumns.size(); inColIndex++){
+			def outCol = inColumns[inColIndex]
+			def requiredColIndex = reuiredColumns.indexOf(outCol)
+			def value = inRecord[inColIndex]
+			if (value == '' && requiredColIndex > -1){
+				requiredColumnsWithoutValues.add(outCol)
+			}
+		}
+		if (requiredColumnsWithoutValues.size() > 0){
+			def error = "MISSING VALUE(S) FOR ${requiredColumnsWithoutValues} ${inRecord}"
+			println error
+			log.append("${error}\n")
+			//continue
+		}
+		return requiredColumnsWithoutValues.size() == 0
+	}
+}
+
+class Website {
+	static String format(String url) {
+		url = url.toLowerCase().trim()
+		if (url != '' && (url.indexOf('http://') != 0 || url.indexOf('https://') != 0)){
+			url = url.replace('http://', '')
+			url = url.replace('https://', '')
+			url = "http://${url}"
+		}
+		return url
+	}
+}
+
+class Phone {
+	static String format(String phone) {
+		if (phone == null || phone.trim() == '') return ''
+		phone = phone.replaceAll('\\(', ' ')
+		phone = phone.replaceAll('\\)', ' ')
+		phone = phone.replaceAll('\\-', ' ')
+		phone = phone.replaceAll('  ', ' ')
+		phone = phone.replaceAll('\\.', ' ')
+		phone = phone.trim()
+		if (phone.indexOf('1') == 0) phone = phone.substring(1).trim()
+		if (phone.indexOf(' ') > -1){
+			def parts = phone.split(' ')
+			def formatted = ''
+			def partIndex = 0
+			for (part in parts) {
+				part = part.trim()
+				if (part.length()){
+					def sep = '-'
+					if (partIndex < 3){
+						if (!part.isNumber()) return ''
+					}else{
+						sep = ' '
+					}
+					formatted = formatted + sep + part
+				}
+				partIndex++
+			}
+			return formatted.substring(1)
+		}else if (phone.length() == 10){
+			return "${phone.substring(0, 3)}-${phone.substring(3, 6)}-${phone.substring(6)}"
+		}
+		return ''
+	}
+}
+
+class Capitalize {
+	static String capitalize(String input) {
+		def capitalize = ''
+		def words = input.split(' ')
+		for (word in words){
+			def letter1 = ''
+			def theRest = ''
+			def len = word.length()
+			if (len > 0){
+				letter1 = word.substring(0, 1).toUpperCase()
+				if (len > 1){
+					theRest = word.substring(1).toLowerCase()
+				}
+			}
+			capitalize = "${capitalize} ${letter1}${theRest}"
+		}
+		return capitalize.trim()
+	}
+}
+
+class Format extends Capitalize {
+	static String format(String input, List addressReplace) {
+		input = input.replace('.', '')
+		input = input.replace('/', '  /  ')
+		input = input.replace('-', '  -  ')
+		input = input.replace('(', '  (  ')
+		input = input.replace(')', '  )  ')
+		input = input.replace(':', '  :  ')
+		input = input.replace(',', '  ,  ')
+		input = input.replace('&', '  &  ')
+		input = input.replace('@', '  @  ')
+		input = " ${this.capitalize(input.trim())} "
+		for (replacementPair in addressReplace) {
+			String search = " ${replacementPair[0]} "
+			String replace = replacementPair[1] != null ? " ${replacementPair[1]} " : ' '
+			input = input.replaceAll(search, replace)
+		}
+		input = input.replace('  ', ' ')
+		input = input.replace('  ', ' ')
+		input = input.replace('  ', ' ')
+		input = input.replace(' ,', ',')
+		return input.trim()
+	}
+}
+

@@ -1,0 +1,620 @@
+html, body {
+	overflow: hidden;
+}
+html, body, .ui-mobile .ui-page-active, #main, #splash {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+html, body, div, span, a, input, input[data-type="search"], li, .leaflet-container, .ui-btn, .ui-page-theme-a .ui-btn, .ui-page-theme-a .ui-btn:visited {
+	font-size: 14px;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	text-shadow: none !important;
+	color: rgb(1,51,100);
+}
+a, div, span, td, .ui-page-theme-a .ui-btn, html .ui-bar-a .ui-btn, html .ui-body-a .ui-btn, html body .ui-group-theme-a .ui-btn, html head+body .ui-btn.ui-btn-a, .ui-page-theme-a .ui-btn: visited, html .ui-bar-a .ui-btn: visited, html .ui-body-a .ui-btn: visited, html body .ui-group-theme-a .ui-btn: visited, html head+body .ui-btn.ui-btn-a:visited {
+	color: #013364;
+}
+.ui-page-theme-a .ui-btn.ui-btn-active, html .ui-bar-a .ui-btn.ui-btn-active, html .ui-body-a .ui-btn.ui-btn-active, html body .ui-group-theme-a .ui-btn.ui-btn-active, html head+body .ui-btn.ui-btn-a.ui-btn-active, .ui-page-theme-a .ui-checkbox-on:after, html .ui-bar-a .ui-checkbox-on:after, html .ui-body-a .ui-checkbox-on:after, html body .ui-group-theme-a .ui-checkbox-on:after, .ui-btn.ui-checkbox-on.ui-btn-a:after, .ui-page-theme-a .ui-flipswitch-active, html .ui-bar-a .ui-flipswitch-active, html .ui-body-a .ui-flipswitch-active, html body .ui-group-theme-a .ui-flipswitch-active, html body .ui-flipswitch.ui-bar-a.ui-flipswitch-active, .ui-page-theme-a .ui-slider-track .ui-btn-active, html .ui-bar-a .ui-slider-track .ui-btn-active, html .ui-body-a .ui-slider-track .ui-btn-active, html body .ui-group-theme-a .ui-slider-track .ui-btn-active, html body div.ui-slider-track.ui-body-a .ui-btn-active {
+	background-color: #80b34e;
+}
+#main {
+	width: 100%;
+	height: 100%;
+}
+#map {
+	position: fixed;
+	width: 100%;
+	bottom: 0;
+	top: 45px;
+}
+span.noshow {
+	display: none;
+}
+.olFramedCloudPopupContent {
+	padding: 0;
+}
+.olControlZoom {
+	display: none;
+}
+.olImageLoadError {
+	visibility: hidden !important;
+}
+.capitalize{
+	text-transform: capitalize;
+}
+
+/* ========================== begin panel ======================== */
+
+#panel {
+    position: fixed;
+	width: 320px;
+	top: 45px;
+	right: 0;
+	bottom: 0;
+	z-index: 1000;
+	box-shadow: 5px 10px 20px 5px rgba(1,51,100,0.5);
+}
+.ui-panel-dismiss {
+	z-index: 999;
+	margin-right: 85px;
+}
+.ui-panel-inner {
+	padding: 0;
+}
+
+/* =========================== end panel ========================= */
+
+
+/* ======================= begin first load ======================== */
+
+#first-load {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #E8E8E8;
+	z-index: 1000000;
+}
+#first-load td {
+	text-align: center;
+}
+#first-load p {
+	font-size: 34px;
+	font-weight: bold;
+	color: black;
+	text-align: center;
+	margin-top: -14px;
+}
+
+/* ======================= end first load ======================== */
+
+
+/* ======================== begin splash ========================= */
+
+#splash {
+	display: none;
+	position: fixed;
+	z-index: 10000;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+div#splash-cont {
+	padding: 10px 6px 5px 6px;
+	background-color: white;
+	border: 2px solid #013364;
+	border-radius: 0.6em;
+	width: 350px;
+	margin: 50px auto;
+	box-shadow: 5px 10px 20px 5px rgba(1,51,100,0.5);
+	max-height: calc(100% - 70px);
+ 	overflow-y: auto;
+}
+#splash a[data-icon="delete"], #splash a[data-icon="delete"]:hover {
+  background-color: transparent;
+  border: none;
+  float: right;
+  margin: -5px -2px 0 3px;
+  box-shadow: none;
+}
+#btn-splash {
+	left: 3px;
+	top: 127px;
+}
+#splash .ctl-btn.ui-btn {
+	background-color: rgba(1,51,100,0.5);
+	float: left;
+	margin: -5px 5px 3px -3px;
+	border-color: #ddd;
+}
+#splash .ui-btn {
+	background-color: #f8993a;
+	border: 1px solid #013364;
+}
+#splash a div {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#splash .ui-btn:hover, #splash .ui-btn:hover div, #splash .ui-btn:hover span {
+	background-color: rgb(1,51,100);
+	color: white;
+}
+.splash-message div {
+	margin-bottom: 8px;
+}
+
+/* ========================= end splash ========================== */
+
+
+/* ========================= begin banner ======================== */
+
+.banner {
+	background-color: #013364 !important;
+	height: 44px;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+}
+.banner-doe-logo {
+	height: 24px;
+	cursor: pointer;
+	position: absolute;
+	left: 3px;
+	top: 10px;
+}
+.banner h1, .banner-school-yr {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.banner h1 {
+	color: white;
+	margin: -9px 0 0 0 !important;
+	cursor: pointer;
+	font-size: 24px !important;
+	font-weight: bold !important;
+	text-align: left !important;
+	position: absolute;
+	left: 80px;
+	top: -7px;
+}
+.banner-school-yr {
+	position: absolute;
+	z-index: 1000;
+	left: 80px;
+	top: 27px;
+}
+.banner-school-yr, .school-yr {
+	color: white;
+	font-size: 12px;
+}
+#map-page .ui-content, #info-page .ui-content, #dir-page .ui-content, #external-page .ui-content {
+	overflow: hidden;
+	position: fixed;
+	top: 45px;
+	bottom: 0;
+	width: 100%;
+}
+#info-page .ui-content, #external-page .ui-content {
+	overflow-y: scroll;
+	padding: 10px;
+	width: calc(100% - 20px);
+}
+/* ========================== end banner ========================= */
+
+
+/* ===================== begin header buttons ==================== */
+
+.hdr-btn {
+	top: 4px;
+}
+.ui-page-theme-a .hdr-btn, .ui-page-theme-a #toggle button {
+	font-size: 12.5px;
+}
+.ui-btn:after {
+	background-color: rgba(1,51,100,0.5);
+}
+#toggle {
+	position: absolute;
+	right: 3px;
+	top: -2px;
+	z-index: 1000;
+	white-space: nowrap;
+}
+#map-page, #toggle {
+	position: fixed;
+}
+
+/* ====================== end header buttons ===================== */
+
+
+/* ===================== begin other buttons ===================== */
+
+.ctl-tbn:hover, .upk-action a:hover, .upk-action a:hover span, #alert .ui-btn:hover, #list-more:hover, #back:hover {
+	background-color: #013364 !important;
+	color: white !important;
+	text-shadow: none !important;
+}
+.ui-btn:hover:after {
+	background-color: rgb(1,51,100);
+}
+#alert .ui-btn, #list-more {
+	width: 44px;
+	height: 20px;
+	padding: 12px 0;
+	text-align: center;
+	vertical-align: middle;
+	margin: auto;
+	text-shadow: none;
+	background-color: rgba(1,51,100,0.5) !important;
+	color: white;
+	border-radius: 0.6em;	
+}
+.ui-btn.ui-corner-all {
+	border-radius: 0.6em;
+}
+/* ====================== end other buttons ====================== */
+
+
+/* ===================== begin external page ===================== */
+
+#external-page, #external-content, #external-page iframe {
+	padding: 0;
+	width: 100%;
+}
+#external-content iframe {
+	border: 0;
+	margin: 0 20px;
+	width: calc(100% - 40px);
+	height: 20000px;
+	overflow: hidden !important;
+}
+.ios #external-content {
+	position: absolute !important;
+}
+body.iso {
+	height: 20000px !important;
+}
+
+/* ====================== end external page ====================== */
+
+
+/* ========================= begin filter ======================== */
+
+.ui-checkbox .type-icon {
+	margin: 1px 5px -5px -1px;
+}
+#filter {
+	margin: 3px 5px;
+}
+#filter .ui-collapsible-content {
+	padding: 1px 5px 0 5px;
+	
+}
+#filter h3 a:after {
+	background-image: url(../img/filter.png);
+	background-size: 12px;
+	background-color: #f8993a;
+}
+#filter label {
+	text-transform: capitalize;
+}
+#filter label.ui-checkbox-on:after {
+	background-color: #80b34e;
+}
+#filter-type .ui-controlgroup-controls, #filter-day .ui-controlgroup-controls {
+	width: 100%;	
+}
+#filter-type a, #filter-day a {
+    font-size: 13px;
+    height: 30px;
+    width: 32%;
+    padding: 5px 0 8px 0;
+}
+span.current-value {
+	display: none;
+}
+a.ui-collapsible-heading-toggle {
+    white-space: normal;
+    text-align: left;
+    text-transform: capitalize;
+}
+
+/* ========================== end filter ========================= */
+
+/* ======================== begin upk list ======================= */
+
+#list-container {
+	overflow: auto;
+}
+#list-table {
+	border-collapse: collapse;
+	width: 100%;
+}
+#list-table td {
+	padding: 3px;
+}
+.upk-info .directions, .upk-info .phone {
+	font-weight: normal;
+	cursor: pointer;
+}
+.even-row {
+	background-color: rgba(1,51,100,0.1);
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+.dist-cell {
+	text-align: center;
+	width: 35px;
+}
+#list-more {
+	height: 44px;
+	margin: 5px;
+	width:  calc(100% - 10px);
+}
+
+/* ========================= end upk list ======================== */
+
+
+/* ======================== begin upk info ======================= */
+
+.name {
+	font-weight: bold;
+}
+.phone {
+	height: 20px;
+	margin: 5px 0 0 0;
+}
+.note {
+	color: red;
+}
+.type-icon {
+	width: 20px;
+	height: 20px;
+	margin: 2px 12px -2px -32px;
+}
+.callout .type-icon {
+	display: none;
+}
+.upk-detail {
+	margin: 5px 5px 0 0;
+	padding: 5px;
+	border-radius: 0.6em;
+	border: 1px solid rgba(1,51,100,0.5);
+	background-color: rgba(1,51,100,0.1);
+}
+.email, .web {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 242px;
+	margin: 10px 0;
+}
+.web a {
+	text-decoration: underline;
+	cursor: pointer;
+}
+.upk-detail ul {
+	margin: 0 0 3px 0;
+}
+.upk-detail li {
+	margin-left: -25px;
+	font-size: 12px;
+}
+.callout .map, .upk-detail, #list-table .directions {
+	display: none;
+}
+.upk-action {
+	font-weight: bold;
+	cursor: pointer;
+	width: 100%;
+	margin: 10px 0 0;
+}
+.upk-action div.directions, .upk-action div.map, .upk-action div.apply {
+    margin: 0 5px 0 0;
+}
+.upk-action div{
+	display: inline-block;
+}
+.upk-action a {
+	padding: 12px 9px;
+	margin: 0;
+	border-radius: 0.6em;
+}
+.odd-row .upk-action a, .odd-row .upk-action a:visited {
+	background-color: white;
+}
+.odd-row .upk-detail {
+	background-color: white;
+}
+div.seats {
+	margin-top: 10px;
+}
+
+/* ========================= end upk info ======================== */
+
+
+/* ========================= begin alert ========================= */
+
+#alert {
+	position: relative;
+	margin: 100px auto;
+	width: 303px;
+	border-radius: 0.6em;
+	border: 1px solid lightgrey;
+	box-shadow: 5px 10px 20px 5px rgba(1,51,100,0.9);
+	display: none;
+	background-color: white;
+	padding: 5px;
+	z-index: 1000;
+	min-height: 74px;
+}
+.alert-msg {
+	text-align: center;	
+	margin: 0 0 5px 0;
+}
+
+/* ========================== end alert ========================== */
+
+
+/* ======================= begin copyright ======================= */
+
+#copyright {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	background-color: rgba(255,255,255,0.5);
+}
+#copyright {
+	font-size: 12px !important;
+	padding: 0 3px;
+}
+
+/* ======================== end copyright ======================== */
+
+
+/* ====================== begin callout ========================== */
+
+#callout .subway-line, #callout .subway-trans, #callout-size-check .subway-line, #callout-size-check t .subway-trans {
+	display: none;
+}
+#callout {
+	max-width: 320px;
+	overflow: hidden;
+}
+#callout_contentDiv {
+	overflow: hidden;
+}
+#callout_FrameDecorationDiv_0, #callout_FrameDecorationDiv_1, #callout_FrameDecorationDiv_2, #callout_FrameDecorationDiv_3 {
+	max-width: 300px;
+}
+#callout .upk-info, #callout .subway-sta, #callout-size-check {
+	max-width: 290px;
+	min-width: 200px;
+	min-height: 100px;	
+}
+#callout-size-check {
+	position: absolute;
+	visibility: hidden;
+	z-index: -1;
+	padding: 5px;
+}
+#callout-size-check .map {
+	display: none;
+}
+#callout_close, #close-fullscreen {
+	background-color: rgba(1,51,100,0.5);
+	border: none;
+	border-radius: 12px;
+	overflow: hidden;
+	background-repeat: no-repeat;
+	background-position: center;
+	margin: -2px -3px 0 0;
+	cursor: pointer;
+}
+#callout_close:hover, #close-fullscreen:hover {
+	background-color: rgb(1,51,100);
+}
+#callout .type-icon {
+	display: none;
+}
+#ol-popup-preload {
+	visibility: hidden;
+}
+.callout.upk-info div.name {
+	max-width: 272px;
+}
+#info-fullscreen {
+	display: none;
+	position: fixed;
+	top: 45px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 200000;
+	background-color: white;
+	padding: 10px;
+	overflow: auto;
+}
+#info-fullscreen .upk-action {
+	display: none;
+}
+#info-fullscreen .upk-detail {
+	display: block;
+}
+/* ========================= end callout ========================= */
+
+
+/* ===================== begin media queries ===================== */
+
+@media only screen and (max-width : 360px) {
+	.banner h1 {
+		font-size: 14px !important;
+		top: 6px;
+	}
+	.banner-school-yr {
+		font-size: 8px;
+		top: 24px;
+	}
+	#toggle button {
+		padding: 9px 12.5px;
+	}
+	div#splash-cont {
+		width: 95%;
+	}
+	a.splash-apply-only {
+		margin-left: 35px;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	#filter {
+		max-height: 400px;
+		overflow: auto;
+	}	
+}
+@media only screen and (max-width : 495px), screen and (max-height: 350px) {
+	#panel {
+		width: 100%;
+	}
+	#list-more{
+		margin: 5px 5px 5px 46px;
+		width: calc(100% - 51px);
+	}
+	.ui-panel-dismiss {
+		display: none;
+	}
+	.upk-action a:hover {
+		background-color: #f6f6f6 !important;
+		color: #013364 !important;
+	}
+	.odd-row .upk-action a:hover {
+		background-color: white !important;
+	}
+	#filter .ui-checkbox {
+		margin: 0 18px;
+	}
+}
+@media only screen and (max-height : 360px) {
+	div#splash-cont {
+		width: 96%;
+		margin: 45px auto;
+	}
+	#splash .ui-btn {
+		margin: 7px 35px;
+	}	
+	#filter .ui-collapsible-content {
+		height: 220px;
+		overflow: auto;
+	}
+	#filter {
+		max-height: 280px;
+		overflow: auto;
+	}	
+}
+
+/* ====================== end media queries ====================== */

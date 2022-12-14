@@ -1,0 +1,133 @@
+#btn-z-in {
+	left: 3px;
+	top: 43px;
+}
+#btn-z-out {
+	left: 3px;
+	top: 85px;
+}
+#fld-srch-container {
+	top: 42px;
+	width: 399px;
+	left: 40px;
+	padding: 0 5px;
+}
+#fld-srch-container .ui-input-search {
+	opacity: 1;
+}
+#fld-srch-container .ui-input-search.ui-focus {
+	opacity: 1;
+}
+#fld-srch-container .ui-corner-all {
+	border-radius: 0.6em;
+}
+#fld-srch-container input {
+	font-size: 17px;
+}
+#btn-srch-typ {
+	position: absolute;
+	right: 10px;
+	top: 8px;
+	background-color: transparent;
+	border: none;
+	opacity: 0.6;
+}
+#btn-srch-typ.ctl-active, #btn-srch-typ:hover {
+	opacity: 1;
+}
+#btn-srch-typ:after, #fld-srch-container .ui-input-clear:after, #mnu-srch-typ .ui-btn-icon-left:after {
+	background-color: rgba(1,51,100,0.5);
+}
+#srch-type-geo span:after {
+	background-image: url(../img/geo.png);
+	background-size: 16px 16px;
+}
+span.srch-upk-icon:after {
+	background-image: url(../img/hand.png);
+	background-size: 16px 16px;
+}
+#fld-srch-container a.ui-input-clear {
+	border: none;
+	border-radius: 22px;
+	background-color: transparent;
+	width: 22px;
+	height: 22px;
+	margin: -11px 6px 0 0;
+}
+.ui-input-search:after {
+	color: rgba(1,51,100,0.5);
+}
+.ui-listview>.ui-li-static {
+	cursor: pointer;
+	padding: 8px;
+	margin: 0;
+}
+.ui-listview>.ui-li-static {
+	cursor: pointer;
+	background-color: white;
+	color: rgb(1,51,100);
+}
+.ui-listview>.ui-li-static:hover {
+	background-color: rgba(1,51,100,0.5);
+	color: white;
+}
+.ui-listview>.ui-li-has-thumb>.ui-btn, .ui-listview>.ui-li-static.ui-li-has-thumb {
+	padding: 14px 3px 0 26px;
+	min-height: 22px;
+	max-height: 22px;
+}
+li.srch-upk img {
+	width: 20px;
+	height: 20px;
+	margin: 7px 3px;
+}
+li.srch-upk span {
+	margin-top: 5px;
+}
+span.srch-upk-id {
+	position:absolute;
+	font-size: 10px;
+	margin-top: -8px !important;
+	opacity: 0.7;
+	font-weight: bold;
+}
+#srch-by {
+	background-color: white;
+	color: rgb(1,51,100);
+	font-weight: bold;
+}
+#fld-srch, #mnu-srch-typ {
+	width: 100%;
+	max-height: 400px;
+	box-shadow: 0 1px 3px rgba(1,51,100,0.2);
+	margin: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	z-index: 3000;
+}
+#fld-srch {
+	margin-top: -2px;
+}
+#mnu-srch-typ {
+	display: none;
+	position: absolute;
+	width: 399px;
+	top: 50px;
+	left: 5px;
+	margin: 0;
+}
+#fld-srch-retention {
+	position: absolute;
+	left: -1000px;
+	top: -1000px;
+}
+@media only screen and (max-width : 405px) {
+	#fld-srch-container, #mnu-srch-typ {
+		width: auto;
+		right: 0;
+	}
+	#mnu-srch-typ {
+		margin-right: 5px;
+	}
+}
+

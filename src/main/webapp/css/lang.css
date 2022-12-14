@@ -1,0 +1,72 @@
+#lang-btn {
+	display: block;
+	top: auto;
+	left: 3px;
+	bottom: 10px;
+	position: fixed;
+	z-index: 100000;
+}
+#lang-choice-button {
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: 1px solid #ddd;
+	background-color: rgba(1,51,100,0.5);
+	cursor: pointer;
+	background-image: url(../img/translate.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 28px 28px;
+}
+#lang-choice-button:hover {
+	background-color: rgb(1,51,100);
+}
+#lang-choice-button span, #lang-choice-button:after, .first-load #lang-btn, .lang-placeholder {
+	display: none;
+}
+#lang-btn .goog-te-gadget-icon, #lang-trans, .skiptranslate, .goog-te-banner-frame {
+	display: none;
+	height: 0;
+	position: absolute;
+	left: -1000px;
+	top: -1000px;
+}
+body .goog-text-highlight {
+	background-color: inherit;
+	-webkit-box-shadow: inherit;
+	-moz-box-shadow: inherit;
+	box-shadow: inherit;
+	box-sizing: inherit;
+	-webkit-box-sizing: inherit;
+	-moz-box-sizing: inherit;
+	position: inherit;
+}
+#lang-hint {
+	display: none;
+	position: absolute;
+	background-image: url(../img/lang-hint-l.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	left: 36px;
+	bottom: -8px;
+	background-size: 128px 64px;
+	width: 128px;
+	height: 36px;
+	padding: 19px 0 11px 10px;
+	text-align: center;
+	z-index: 100000;
+}
+#lang-hint span {
+	font-size: 20px;
+	font-weight: bold;	
+}
+#lang-hint a {
+	position: absolute;
+	top: -3px;
+	right: -6px;
+	border: none;
+	background-color: white;
+	border-radius: 22px;
+	width: 26px;
+	height: 26px;
+}
